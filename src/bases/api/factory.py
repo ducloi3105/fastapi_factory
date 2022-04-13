@@ -35,9 +35,6 @@ class Factory(object):
     def default_error_handler(app):
         @app.exception_handler(Exception)
         def handle_error(e, response):
-            print(1111111, response.status_code, response.output())
-            print('222222')
-
             if isinstance(e, HTTPError):
                 status_code = e.status_code
                 data = e.output()
@@ -96,7 +93,7 @@ class Factory(object):
         @app.middleware('http')
         async def add_process_time_header(request: Request, call_next):
             start_time = time.time()
-            # self.log_request()
+            self.log_request(request)
 
             # init global variable
             initial_g = types.SimpleNamespace()
@@ -119,27 +116,20 @@ class Factory(object):
 
         return app
 
-    # @staticmethod
-    # def log_request():
-    #     pattern = 'RECEIVED REQUEST - {method} - {path} - {payload}'
-    #
-    #     try:
-    #         json = request.json
-    #     except Exception:
-    #         json = {}
-    #
-    #     payload = dict(
-    #         agrs=request.args.to_dict(),
-    #         json=json,
-    #         form=request.form.to_dict()
-    #     )
-    #
-    #     log_data(
-    #         mode='warning',
-    #         template=pattern,
-    #         kwargs=dict(
-    #             path=request.path,
-    #             payload=payload,
-    #             method=request.method
-    #         )
-    #     )
+    @staticmethod
+    def log_request(request):
+        pattern = 'RECEIVED REQUEST - {method} - {path} - {payload}'
+
+        payload = dict(
+            body=request.body.__dict__,
+        )
+
+        log_data(
+            mode='warning',
+            template=pattern,
+            kwargs=dict(
+                path=request.base_url,
+                payload=payload,
+                method=request.method
+            )
+        )
