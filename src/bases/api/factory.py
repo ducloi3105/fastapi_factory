@@ -39,7 +39,7 @@ class Factory(object):
                 status_code = e.status_code
                 data = e.output()
             elif isinstance(e, HTTPException):
-                status_code = e.code
+                status_code = e.status_code
                 data = e.__class__.__name__
             elif isinstance(e, Request):
                 status_code = response.status_code
