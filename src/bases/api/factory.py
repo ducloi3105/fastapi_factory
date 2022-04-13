@@ -6,17 +6,15 @@ import sys
 import time
 import types
 
-from fastapi import FastAPI, Response, Request
+from fastapi import FastAPI, Response, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.routing import APIRouter
-from werkzeug.exceptions import HTTPException
+# from werkzeug.exceptions import HTTPException
 
 from src.bases.error.api import HTTPError
 from src.common.requestvars import request_global, g
 from src.common.utils import log_data
-
-from .resource import Resource
 
 
 class Factory(object):
@@ -36,13 +34,19 @@ class Factory(object):
     @staticmethod
     def default_error_handler(app):
         @app.exception_handler(Exception)
-        def handle_error(e):
+        def handle_error(e, response):
+            print(1111111, response.status_code, response.output())
+            print('222222')
+
             if isinstance(e, HTTPError):
                 status_code = e.status_code
                 data = e.output()
             elif isinstance(e, HTTPException):
                 status_code = e.code
                 data = e.__class__.__name__
+            elif isinstance(e, Request):
+                status_code = response.status_code
+                data = response.output()
             else:
                 status_code = 500
                 data = dict(message='Server error - %s' % e)
@@ -57,53 +61,7 @@ class Factory(object):
             )
 
     def install_resource(self, app):
-        if not self.resource_module:
-            return
-
-        resource_classes = set()
-        rs_root_pack = self.resource_module.__name__.split('.')
-        rs_root_dir = os.path.dirname(self.resource_module.__file__)
-
-        if sys.platform == 'linux':
-            dir_separator = '/'
-        else:
-            dir_separator = '\\'
-
-        for dir_path, dir_names, file_names in os.walk(rs_root_dir):
-            diff = os.path.relpath(dir_path, rs_root_dir)
-            if diff == '.':
-                diff_dirs = []
-            else:
-                diff_dirs = diff.split(dir_separator)
-            target_pack_prefix = rs_root_pack + diff_dirs
-            for dir_name in dir_names:
-                target_pack = target_pack_prefix + [dir_name]
-                module = importlib.import_module('.'.join(target_pack))
-                classes = inspect.getmembers(module,
-                                             inspect.isclass)
-                for cls_name, cls in classes:
-                    resource_classes.add(cls)
-
-        for cls in resource_classes:
-            if not issubclass(cls, Resource):
-                continue
-
-            # ignore resources those have none endpoint attr
-            if not cls.endpoint:
-                continue
-
-            endpoint = cls.endpoint
-            # if cls.endpoint_prefix:
-            #     endpoint = cls.endpoint_prefix + endpoint
-            # print(endpoint, cls.as_view(cls.__name__).__dict__)
-            view = cls.as_view(cls.__name__)
-            print(view)
-            router = APIRouter()
-            # router.include_router(
-            #     view.router,
-            # )
-            # app.add_url_rule(endpoint,
-            #                  view_func=cls.as_view(cls.__name__))
+        return
 
     def create_app(self):
         app = FastAPI()
@@ -130,9 +88,9 @@ class Factory(object):
         error_handler(app)
 
         '''Include docs'''
-        @app.get("/", include_in_schema=False)
-        def redirect_to_docs() -> RedirectResponse:
-            return RedirectResponse("/docs")
+        # @app.get("/", include_in_schema=False)
+        # def redirect_to_docs() -> RedirectResponse:
+        #     return RedirectResponse("/docs")
 
         '''Callbacks configuration'''
         @app.middleware('http')
@@ -145,37 +103,16 @@ class Factory(object):
             request_global.set(initial_g)
 
             # set connect sql session
-            g().sql_session = self.sql_session_factory()
 
+            request.state.session = self.sql_session_factory()
             response = await call_next(request)
 
             # close connection sql
-            g().sql_session.close()
-            g().sql_session_factory.remove()
+            request.state.session.close()
 
             process_time = time.time() - start_time
             response.headers['X-Process-Time'] = str(process_time)
             return response
-
-        @app.on_event("startup")
-        async def connect_to_database() -> None:
-            g().sql_session = self.sql_session_factory()
-
-        @app.on_event("shutdown")
-        async def shutdown() -> None:
-            g().sql_session.close()
-            g().sql_session_factory.remove()
-
-        # @app.before_request
-        # def handle_before_request():
-        #     self.log_request()
-        #     g.sql_session = self.sql_session_factory()
-        #
-        # @app.after_request
-        # def handle_after_request(response):
-        #     g.sql_session.close()
-        #     self.sql_session_factory.remove()
-        #     return response
 
         '''Resources installation'''
         self.install_resource(app)

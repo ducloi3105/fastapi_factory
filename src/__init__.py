@@ -1,6 +1,7 @@
 import logging
 import click
 import sys
+import uvicorn
 
 from config import POSTGRES_URI, MONGO_URI, REDIS, ENVIRONMENT
 
@@ -62,53 +63,42 @@ def shell(ipython_args):
 
 
 @cli.command(short_help='Run an api.')
-@click.option('--uwsgi', default='false')
 @click.option('--port', default='5000')
-@click.option('--processes', default='1')
-@click.option('--threads', default='500')
+@click.option('--log_level', default='info')
+@click.option('--workers', default='1')
+@click.option('--reload', default='1')
 @click.option('--buffer-size', default='65535')
 @click.option('--host')
 def api(**kwargs):
+    from src.api.base import app
+
     setup_logging()
 
-    uwsgi_enabled = False if kwargs['uwsgi'] == 'false' else True
     host = kwargs.get('host')
     try:
         port = int(kwargs['port'])
     except Exception as e:
         raise e
 
-    if not uwsgi_enabled:
-        from src.api import app
-        params = dict(port=port, debug=True)
-        if host:
-            params['host'] = host
-        command = ['uvicorn', 'src/api/__init__:app', '--reload']
-        return execute_command(command)
-
-    command = ['uwsgi', '--wsgi-file=src/api/__init__.py']
-
-    try:
-        processes = int(kwargs['processes'])
-        threads = int(kwargs['threads'])
-        buffer_size = int(kwargs['buffer_size'])
-    except Exception as e:
-        raise e
-
-    command.append('--processes=%s' % processes)
-    command.append('--threads=%s' % threads)
-    command.append('--buffer-size=%s' % buffer_size)
-
+    params = dict(port=port, debug=True)
     if host:
-        command.append('--http-socket=%s:%s' % (host, port))
-    else:
-        command.append('--http-socket=:%s' % port)
+        params['host'] = host
+    log_level = kwargs.get('log_level')
+    debug = False
+    if log_level == 'info':
+        debug = True
 
-    command.extend(['--lazy-apps',
-                    '--callable=app',
-                    '--enable-threads'
-                    ])
-    return execute_command(command)
+    params = dict(
+        port=port,
+        workers=int(kwargs.get('workers')),
+        log_level=log_level,
+        debug=debug,
+        reload=True
+    )
+    return uvicorn.run(
+        'src.api.base:app', **params
+
+    )
 
 
 @cli.command(short_help='Run celery')
