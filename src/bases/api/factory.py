@@ -46,7 +46,7 @@ class Factory(object):
                 data = response.output()
             else:
                 status_code = 500
-                data = dict(message='Server error - %s' % e)
+                data = dict(detail='Server error - %s' % e)
 
             if status_code >= 500:
                 sentry_sdk.capture_exception(e)
@@ -102,8 +102,11 @@ class Factory(object):
             # set connect sql session
 
             request.state.session = self.sql_session_factory()
-            response = await call_next(request)
+            # request.state.async_session = self.sql_session_factory()
 
+            self.before_auth()
+            response = await call_next(request)
+            self.after_auth()
             # close connection sql
             request.state.session.close()
 
@@ -116,6 +119,11 @@ class Factory(object):
 
         return app
 
+    def before_auth(self):
+        print('before auth')
+
+    def after_auth(self):
+        print('after auth')
     @staticmethod
     def log_request(request):
         pattern = 'RECEIVED REQUEST - {method} - {path} - {payload}'

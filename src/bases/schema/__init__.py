@@ -1,8 +1,7 @@
-from marshmallow import Schema, fields as marshmallow_fields
+from pydantic import BaseModel
+from fastapi import Query
+from src.common.constants import PAGINATION, STRING_LENGTH
 
-from src.common.constants import PAGINATION
-
-from .fields import *
 
 STRING_LENGTH_VALIDATORS = {
     'EX_SHORT': lambda value: len(value) <= STRING_LENGTH['EX_SHORT'],
@@ -15,26 +14,11 @@ STRING_LENGTH_VALIDATORS = {
 }
 
 
-class BaseSchema(Schema):
+class BaseSchema(BaseModel):
     pass
 
 
 class BaseListingSchema(BaseSchema):
-    page = marshmallow_fields.Integer(missing=PAGINATION['page'])
-    per_page = marshmallow_fields.Integer(missing=PAGINATION['per_page'])
-
-    sorts = ListField(StringField(validate=STRING_LENGTH_VALIDATORS['LONG']),
-                      default=['-created_at'])
-
-    def load(self, data, **kwargs):
-        result = super().load(data, **kwargs)
-        if not result.get('page'):
-            result['page'] = PAGINATION['page']
-
-        if not result.get('per_page'):
-            result['per_page'] = PAGINATION['per_page']
-
-        if not result.get('sorts'):
-            result['sorts'] = ['-created_at']
-
-        return result
+    page: int | None = PAGINATION['page']
+    per_page: int | None = PAGINATION['per_page']
+    sorts: list | None = ['-created_at']

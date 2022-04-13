@@ -8,7 +8,9 @@ from config import (POSTGRES_URI, ApiConfig)
 class APIFactory(Factory):
     def install_resource(self, app):
         from src.api.resources.health_check.methods import router
+        from src.api.resources.test.methods import trouter
         app.include_router(router)
+        app.include_router(trouter)
 
 
 def trigger_auto_sync(session):
@@ -22,7 +24,7 @@ sql_session_factory = sql_db.create_session_factory(
         'after_commit': trigger_auto_sync
     }
 )
-
+# sql_async_session = sql_db.create_async_engine
 factory = APIFactory(
     sql_session_factory=sql_session_factory,
     resource_module=resources,

@@ -1,7 +1,6 @@
 from src.bases.error.base import BaseError
 
 
-
 class HTTPError(BaseError):
     status_code = 500
 

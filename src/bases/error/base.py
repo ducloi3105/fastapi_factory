@@ -3,11 +3,11 @@ import json
 
 class BaseError(Exception):
     error = None
-    message = 'An unknown error happened.'
+    detail = 'An unknown error happened.'
 
-    def __init__(self, error=None, message=None, meta=None):
-        if message:
-            self.message = message
+    def __init__(self, error=None, detail=None, meta=None):
+        if detail:
+            self.detail = detail
 
         if error:
             self.error = error
@@ -18,7 +18,7 @@ class BaseError(Exception):
 
     def output(self):
         data = {
-            'message': self.message,
+            'detail': self.detail,
             'error': self.error
         }
         if self.meta:

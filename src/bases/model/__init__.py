@@ -158,3 +158,17 @@ class BaseModel(Base):
 
             setattr(result, field_name, value)
         return result
+
+
+class Person(object):
+    email = Column(String(STRING_LENGTH['LONG']), index=True)
+    phone = Column(String(STRING_LENGTH['EX_SHORT']), index=True)
+    name = Column(String(STRING_LENGTH['LONG']), index=True)
+    address = Column(String(STRING_LENGTH['LONG']))
+    gender = Column(String(STRING_LENGTH['EX_SHORT']), index=True)
+
+
+class Translation(object):
+    language_code = Column(String(STRING_LENGTH['LONG']),
+                           index=True, nullable=False)
+    name = Column(String(STRING_LENGTH['LONG']), index=True)

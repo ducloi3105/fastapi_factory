@@ -9,19 +9,6 @@ TMP_DIR = os.path.join(ROOT_DIR, 'tmp')
 if not os.path.exists(TMP_DIR):
     os.makedirs(TMP_DIR)
 
-HELM_CHARTS_DIR = os.path.join(TMP_DIR, 'charts')
-if not os.path.exists(HELM_CHARTS_DIR):
-    os.makedirs(HELM_CHARTS_DIR)
-
-GOQUO_PAYMENT_CREDENTIALS_FILE = os.path.join(ROOT_DIR,
-                                              'goquo_payment.credentials.json')
-if os.path.exists(GOQUO_PAYMENT_CREDENTIALS_FILE):
-    GOQUO_PAYMENT_CREDENTIALS = json.loads(
-        open(GOQUO_PAYMENT_CREDENTIALS_FILE, 'r').read()
-    )
-else:
-    GOQUO_PAYMENT_CREDENTIALS = {}
-
 PHONE_REGEX = r'^(\+8[0-9]{9,12})$|^(0[0-9]{6,15})$'
 
 DICT_KEY_SEPARATOR = '~|~'
@@ -62,32 +49,11 @@ PAGINATION = {
     'per_page': 50
 }
 
-PAYMENT_STATUSES = [
-    {
-        'id': 'processing',
-        'color': 'orange'
-    },
-    {
-        'id': 'failed',
-        'color': 'negative'
-    },
-    {
-        'id': 'success',
-        'color': 'positive'
-    },
-    {
-        'id': 'refunded',
-        'color': 'purple'
-    },
-]
-
-PAYMENT_METHODS = [
-    {
-        'id': 'b2b-balance',
-        'label': 'B2B Balance'
-    },
-    {
-        'id': 'goquo',
-        'label': 'Credit Card'
-    }
+MESSAGE_STATES = [
+    'draft',
+    'sending',
+    'sending failed',
+    'sent',
+    'actions_pending',
+    'actions_committed'
 ]
