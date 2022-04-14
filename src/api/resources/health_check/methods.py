@@ -9,5 +9,4 @@ router = BaseRouter()
 
 @router.get(endpoint, tags=tags)
 def health_check(request: Request):
-    session = request.state.session
     return dict(success=True)

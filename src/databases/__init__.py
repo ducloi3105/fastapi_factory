@@ -1,9 +1,9 @@
 import json
 
 from redis import Redis as _Redis
-from pymongo import MongoClient
+# from pymongo import MongoClient
 
-from .postgres import Postgres
+from .postgres import Postgres, PostgresAsync
 
 
 class Redis(_Redis):
@@ -27,12 +27,13 @@ class Redis(_Redis):
         return super().set(key, value, **kwargs)
 
 
-class Mongo(MongoClient):
-    pass
+# class Mongo(MongoClient):
+#     pass
 
 
 __all__ = (
     'Postgres',
+    'PostgresAsync',
     'Redis',
-    'Mongo'
+    # 'Mongo'
 )

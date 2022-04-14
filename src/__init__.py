@@ -34,7 +34,8 @@ def shell(ipython_args):
     import IPython
     from IPython.terminal.ipapp import load_default_config
 
-    from src.databases import Postgres, Mongo, Redis
+    from src.databases import Postgres, Redis
+    # from src.databases import Postgres, Mongo, Redis
 
     setup_logging()
 
@@ -49,7 +50,7 @@ def shell(ipython_args):
     ctx = dict(
         session=session,
         session_factory=session_factory,
-        mongo=Mongo(MONGO_URI),
+        # mongo=Mongo(MONGO_URI),
         reids=Redis(**REDIS, db=0)
     )
 

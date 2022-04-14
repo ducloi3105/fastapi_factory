@@ -38,7 +38,6 @@ class Message(BaseModel):
     )
     old_folder_id = Column(
         String(STRING_LENGTH['UUID4']),
-        ForeignKey('folder.id'),
         nullable=True,
         index=True
     )
@@ -53,13 +52,6 @@ class Message(BaseModel):
         ForeignKey('thread.id'),
         nullable=False,
         index=True
-    )
-
-    old_folder = relationship(
-        'Folder',
-        backref=backref('messages',
-                        cascade='all,delete',
-                        uselist=False)
     )
 
     folder = relationship(

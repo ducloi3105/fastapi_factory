@@ -6,9 +6,12 @@ from src.bases.model import BaseModel, Person, Column, String
 
 
 class Folder(BaseModel):
-    account_id = Column(String(STRING_LENGTH['UUID4']),
-                        nullable=False, index=True)
-
+    account_id = Column(
+        String(STRING_LENGTH['UUID4']),
+        ForeignKey('account.id'),
+        nullable=False,
+        index=True
+    )
     name = Column(String(STRING_LENGTH['SHORT']),
                   nullable=False, index=True)
 

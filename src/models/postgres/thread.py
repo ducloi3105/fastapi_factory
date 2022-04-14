@@ -47,9 +47,3 @@ class Thread(BaseModel):
         secondary=folders,
         backref=backref('threads')
     )
-
-    old_folder = relationship(
-        'Folder',
-        backref=backref('threads',
-                        cascade='all,delete')
-    )

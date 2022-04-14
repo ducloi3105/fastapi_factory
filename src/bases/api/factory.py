@@ -20,12 +20,14 @@ from src.common.utils import log_data
 class Factory(object):
     def __init__(self,
                  sql_session_factory=None,
+                 sql_async_session_factory=None,
                  resource_module=None,
                  error_handler=None,
                  request_callback=None,
                  response_callback=None):
 
         self.sql_session_factory = sql_session_factory
+        self.sql_async_session_factory = sql_async_session_factory
         self.resource_module = resource_module
         self.error_handler = error_handler
         self.request_callback = request_callback
@@ -42,11 +44,17 @@ class Factory(object):
                 status_code = e.status_code
                 data = e.__class__.__name__
             elif isinstance(e, Request):
-                status_code = response.status_code
-                data = response.output()
+                print(e, 12312123, response)
+                try:
+                    status_code = response.status_code
+                    data = response.output()
+                except:
+                    status_code = 500
+                    data = dict(detail='Server error')
+
             else:
                 status_code = 500
-                data = dict(detail='Server error - %s' % e)
+                data = dict(detail='Server error')
 
             if status_code >= 500:
                 sentry_sdk.capture_exception(e)
@@ -121,13 +129,14 @@ class Factory(object):
             # set connect sql session
 
             request.state.session = self.sql_session_factory()
-            # request.state.async_session = self.sql_session_factory()
+            request.state.async_session = self.sql_async_session_factory()
 
             self.before_auth()
             response = await call_next(request)
             self.after_auth()
             # close connection sql
             request.state.session.close()
+            request.state.async_session.close()
 
             process_time = time.time() - start_time
             response.headers['X-Process-Time'] = str(process_time)

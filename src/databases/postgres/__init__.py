@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, event, inspect
 from sqlalchemy.orm import sessionmaker, scoped_session, Session as BaseSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 
 from src.bases.model import Query
 
@@ -94,5 +95,52 @@ class Postgres(object):
                 event.listen(session_class,
                              key,
                              callback_func)
+
+        return session_class
+
+
+class PostgresAsync(object):
+    def __init__(self,
+                 uri,
+                 pool_size=50,
+                 max_overflow=0):
+        self.uri = uri
+
+        self.engine = None
+
+        self._setup_engine(
+            pool_size=pool_size,
+            max_overflow=max_overflow
+        )
+
+    def _setup_engine(self, pool_size=50, max_overflow=0):
+        self.engine = create_async_engine(
+            self.uri
+            # client_encoding='utf8',
+            # pool_recycle=7200,
+            # pool_pre_ping=True,
+            # pool_size=pool_size,
+            # max_overflow=max_overflow
+        )
+
+    def create_session_factory(self,
+                               disable_autoflush: bool = False,
+                               callback_events: dict = None,
+                               ) -> scoped_session:
+        params = dict(
+            bind=self.engine,
+            class_=AsyncSession
+        )
+        if disable_autoflush:
+            params['autoflush'] = False
+
+        session_factory = sessionmaker(**params)
+        session_class = scoped_session(session_factory)
+
+        # if callback_events:
+        #     for key, callback_func in callback_events.items():
+        #         event.listen(session_class,
+        #                      key,
+        #                      callback_func)
 
         return session_class
