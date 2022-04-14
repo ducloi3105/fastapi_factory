@@ -20,7 +20,7 @@ class Message(BaseModel):
         String(STRING_LENGTH['LONG']), index=True
     )
     subject = Column(
-        String(STRING_LENGTH['MEDIUM']), index=True
+        String(STRING_LENGTH['LONG'])
     )
 
     received_at = Column(DateTime, index=True)  # sort by
@@ -28,7 +28,7 @@ class Message(BaseModel):
 
     read = Column(Boolean, index=True)
     starred = Column(Boolean, index=True)
-    state = Column(Enum(*MESSAGE_STATES), index=True)
+    state = Column(Enum(*MESSAGE_STATES, name='state'), index=True)
 
     folder_id = Column(
         String(STRING_LENGTH['UUID4']),

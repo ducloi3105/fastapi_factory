@@ -18,7 +18,7 @@ class Tracker(BaseModel):
         ForeignKey('thread.id'),
         index=True
     )
-    sender = Column(String(STRING_LENGTH['MEDIUM']))
+    sender = Column(String(STRING_LENGTH['LONG']))
     view_count = Column(Integer, default=0, index=True)
     is_muted = Column(Boolean, default=False, index=True)
     first_seen = Column(DateTime, index=True)
