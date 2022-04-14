@@ -5,7 +5,7 @@ description = ""
 authors = ["LoiND"]
 
 [tool.poetry.dependencies]
-python = "3.10.0"
+python = "3.10.4"
 pyjwt = "1.7.1"
 cryptography = "^35.0.0"
 python-slugify = "^5.0.2"
