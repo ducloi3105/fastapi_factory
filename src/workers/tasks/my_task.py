@@ -6,6 +6,6 @@ class Handler(TaskHandler):
         raise Exception('ImplementTask')
 
 
-class CrawlingCurrencyConversions(Task):
+class MyTask(Task):
     name = 'MyTask'
     handler = Handler
