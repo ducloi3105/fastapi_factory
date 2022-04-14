@@ -129,7 +129,8 @@ class PostgresAsync(object):
                                ) -> scoped_session:
         params = dict(
             bind=self.engine,
-            class_=AsyncSession
+            class_=AsyncSession,
+            expire_on_commit=False,
         )
         if disable_autoflush:
             params['autoflush'] = False

@@ -36,7 +36,10 @@ class Factory(object):
     @staticmethod
     def default_error_handler(app):
         @app.exception_handler(Exception)
-        def handle_error(e, response):
+        async def handle_error(e, response):
+            e.state.session.rollback()
+            await e.state.async_session.rollback()
+
             if isinstance(e, HTTPError):
                 status_code = e.status_code
                 data = e.output()
@@ -44,7 +47,6 @@ class Factory(object):
                 status_code = e.status_code
                 data = e.__class__.__name__
             elif isinstance(e, Request):
-                print(e, 12312123, response)
                 try:
                     status_code = response.status_code
                     data = response.output()
@@ -136,7 +138,7 @@ class Factory(object):
             self.after_auth()
             # close connection sql
             request.state.session.close()
-            request.state.async_session.close()
+            await request.state.async_session.close()
 
             process_time = time.time() - start_time
             response.headers['X-Process-Time'] = str(process_time)

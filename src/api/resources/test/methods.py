@@ -11,7 +11,7 @@ router = BaseRouter()
 
 
 @router.get(endpoint, tags=tags)
-def test(payload: GetSchema = Depends(GetSchema), request: Request = None):
-    session = request.state.session
-    print(payload.search_text)
+async def test(payload: GetSchema = Depends(GetSchema), request: Request = None):
+    session = request.state.async_session
+    account = 1
     return dict(success=True)
