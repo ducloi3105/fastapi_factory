@@ -1,10 +1,10 @@
 from fastapi import Request
 from src.bases.api.router import BaseRouter
 
-router = BaseRouter()
-
 endpoint = '/health-check'
 tags = ['health-check']
+
+router = BaseRouter()
 
 
 @router.get(endpoint, tags=tags)

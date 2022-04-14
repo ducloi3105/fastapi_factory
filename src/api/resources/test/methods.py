@@ -4,13 +4,13 @@ from src.bases.error.api import BadRequestParams
 
 from .schemas import GetSchema
 
-trouter = BaseRouter()
-
 endpoint = '/test'
 tags = ['test']
 
+router = BaseRouter()
 
-@trouter.get(endpoint, tags=tags)
+
+@router.get(endpoint, tags=tags)
 def test(payload: GetSchema = Depends(GetSchema), request: Request = None):
     session = request.state.session
     print(payload.search_text)

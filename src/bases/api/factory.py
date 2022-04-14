@@ -9,7 +9,7 @@ import types
 from fastapi import FastAPI, Response, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
-from fastapi.routing import APIRouter
+from .router import BaseRouter
 # from werkzeug.exceptions import HTTPException
 
 from src.bases.error.api import HTTPError
@@ -58,7 +58,25 @@ class Factory(object):
             )
 
     def install_resource(self, app):
-        return
+        if not self.resource_module:
+            return
+
+        rs_root_pack = self.resource_module.__name__.split('.')
+        rs_root_dir = os.path.dirname(self.resource_module.__file__)
+        for dir_path, dir_names, file_names in os.walk(rs_root_dir):
+            diff = os.path.relpath(dir_path, rs_root_dir)
+            if diff == '.':
+                diff_dirs = []
+            else:
+                diff_dirs = diff.split('/')
+            target_pack_prefix = rs_root_pack + diff_dirs
+            for dir_name in dir_names:
+                if dir_name == '__pycache__':
+                    continue
+                target_pack = target_pack_prefix + [dir_name] + ['methods']
+                module = importlib.import_module('.'.join(target_pack))
+                if hasattr(module, 'router'):
+                    app.include_router(module.router)
 
     def create_app(self):
         app = FastAPI()
@@ -90,6 +108,7 @@ class Factory(object):
         #     return RedirectResponse("/docs")
 
         '''Callbacks configuration'''
+
         @app.middleware('http')
         async def add_process_time_header(request: Request, call_next):
             start_time = time.time()
@@ -124,6 +143,7 @@ class Factory(object):
 
     def after_auth(self):
         print('after auth')
+
     @staticmethod
     def log_request(request):
         pattern = 'RECEIVED REQUEST - {method} - {path} - {payload}'

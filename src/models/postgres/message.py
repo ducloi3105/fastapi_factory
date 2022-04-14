@@ -69,13 +69,13 @@ class Message(BaseModel):
     )
 
     account = relationship(
-        'account',
+        'Account',
         backref=backref('messages',
                         cascade='all,delete')
     )
 
     thread = relationship(
-        'thread',
+        'Thread',
         backref=backref('messages',
                         cascade='all,delete')
     )
