@@ -16,8 +16,8 @@ ENVIRONMENT = data.get('ENVIRONMENT', 'local')
 SECRET_KEY = data.get('SECRET_KEY', 'secret_key')
 
 MONGO_URI = data.get('MONGO_URI', 'mongo_uri')
-POSTGRES_URI = 'postgresql://' + data.get('POSTGRES_URI', 'postgres_uri')
-POSTGRES_ASYNC_URI = 'postgresql+asyncpg://' + data.get('POSTGRES_URI', 'postgres_uri')
+POSTGRES_URI = data.get('POSTGRES_URI', 'postgres_uri')
+POSTGRES_ASYNC_URI = data.get('POSTGRES_URI', 'postgres_uri').replace("postgresql://", "postgresql+async://")
 BASE_DOMAIN = data.get('BASE_DOMAIN', 'localhost')
 
 REDIS = data.get('REDIS', {
