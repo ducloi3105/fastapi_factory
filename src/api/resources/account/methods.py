@@ -1,11 +1,10 @@
-from fastapi import Request, Depends
-from src.bases.api.router import BaseRouter
+from src.bases.api import Request, Depends
+from src.bases.api.router import router
+
 from .schemas import GetSchema
 
 endpoint = '/account'
 tags = ['account']
-
-router = BaseRouter()
 
 
 @router.get(endpoint, tags=tags)

@@ -1,13 +1,11 @@
 from fastapi import Request, Depends
-from src.bases.api.router import BaseRouter
+from src.bases.api.router import router
 from src.bases.error.api import BadRequestParams
 
 from .schemas import GetSchema
 
 endpoint = '/test'
 tags = ['test']
-
-router = BaseRouter()
 
 
 @router.get(endpoint, tags=tags)
