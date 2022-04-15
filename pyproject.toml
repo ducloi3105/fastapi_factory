@@ -9,13 +9,10 @@ python = "3.10.4"
 pyjwt = "1.7.1"
 cryptography = "^35.0.0"
 python-slugify = "^5.0.2"
-
 requests = "2.24.0"
 redis = "^4.1.2"
-
 click = "^8.0.3"
 sentry-sdk = {extras = ["flask"], version = "^1.4.3"}
-
 SQLAlchemy = "1.4.35"
 alembic = "1.7.5"
 ipython = "^7.29.0"
