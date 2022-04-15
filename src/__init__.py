@@ -64,6 +64,7 @@ def shell(ipython_args):
 
 
 @cli.command(short_help='Run an api.')
+@click.option('--host', default='127.0.0.1')
 @click.option('--port', default='5000')
 @click.option('--log_level', default='info')
 @click.option('--workers', default='1')
@@ -81,9 +82,6 @@ def api(**kwargs):
     except Exception as e:
         raise e
 
-    params = dict(port=port, debug=True)
-    if host:
-        params['host'] = host
     log_level = kwargs.get('log_level')
     debug = False
     if log_level == 'info':
@@ -96,6 +94,9 @@ def api(**kwargs):
         debug=debug,
         reload=True
     )
+    if host:
+        params['host'] = host
+
     return uvicorn.run(
         'src.api.base:app', **params
 
