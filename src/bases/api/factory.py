@@ -1,20 +1,15 @@
-import inspect
 import sentry_sdk
 import os
 import importlib
-import sys
 import time
 import types
 
 from fastapi import FastAPI, Response, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, RedirectResponse
-from .router import BaseRouter
-# from werkzeug.exceptions import HTTPException
-
+from fastapi.responses import JSONResponse
 from src.bases.error.api import HTTPError
-from src.common.requestvars import request_global, g
-from src.common.utils import log_data
+from src.common.logging import log_data
+from src.common.context import correlation_id
 
 
 class Factory(object):
@@ -121,13 +116,9 @@ class Factory(object):
 
         @app.middleware('http')
         async def add_process_time_header(request: Request, call_next):
+            correlation_id.set(time.time())
             start_time = time.time()
             self.log_request(request)
-
-            # init global variable
-            initial_g = types.SimpleNamespace()
-            request_global.set(initial_g)
-
             # set connect sql session
 
             request.state.session = self.sql_session_factory()
@@ -150,14 +141,14 @@ class Factory(object):
         return app
 
     def before_auth(self):
-        print('before auth')
+        pass
 
     def after_auth(self):
-        print('after auth')
+        pass
 
     @staticmethod
     def log_request(request):
-        pattern = 'RECEIVED REQUEST - {method} - {path} - {payload}'
+        pattern = '{method} - {path} - {payload}'
 
         payload = dict(
             body=request.body.__dict__,
@@ -167,7 +158,7 @@ class Factory(object):
             mode='warning',
             template=pattern,
             kwargs=dict(
-                path=request.base_url,
+                path=request.url,
                 payload=payload,
                 method=request.method
             )

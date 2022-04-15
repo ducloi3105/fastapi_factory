@@ -1,6 +1,7 @@
 from fastapi import Request, Depends
 from src.bases.api.router import router
 from src.bases.error.api import BadRequestParams
+from fastapi import FastAPI, HTTPException
 
 from .schemas import GetSchema
 
@@ -10,6 +11,4 @@ tags = ['test']
 
 @router.get(endpoint, tags=tags)
 async def test(payload: GetSchema = Depends(GetSchema), request: Request = None):
-    session = request.state.async_session
-    account = 1
     return dict(success=True)

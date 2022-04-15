@@ -5,7 +5,7 @@ from functools import wraps
 from requests.exceptions import ConnectionError, ConnectTimeout
 
 from src.common.json_encoders import CustomJsonEncoder
-from src.common.utils import log_data
+from src.common.logging import log_data
 
 
 def request_connection_handler(max_retry=2):

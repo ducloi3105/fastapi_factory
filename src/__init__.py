@@ -1,25 +1,15 @@
-import logging
 import click
 import sys
 import uvicorn
 
 from config import POSTGRES_URI, MONGO_URI, REDIS, ENVIRONMENT
 
-from src.common.utils import log
+from src.common.logging import log, ContextFilter
 
 
 def execute_command(command):
     import subprocess
     return subprocess.check_call(command)
-
-
-def setup_logging():
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setFormatter(logging.Formatter(
-        "%(asctime)s --  %(levelname)s  -- %(message)s")
-    )
-    log.setLevel(logging.INFO)
-    log.addHandler(ch)
 
 
 @click.group()
@@ -36,8 +26,6 @@ def shell(ipython_args):
 
     from src.databases import Postgres, Redis
     # from src.databases import Postgres, Mongo, Redis
-
-    setup_logging()
 
     ip_config = load_default_config()
 
@@ -73,8 +61,6 @@ def shell(ipython_args):
 @click.option('--host')
 def api(**kwargs):
     from src.api.base import app
-
-    setup_logging()
 
     host = kwargs.get('host')
     try:
@@ -136,8 +122,6 @@ def celery(**kwargs):
 #     from src.cronjobs import JOBS
 #     from src.databases import Redis, Mongo
 #
-#     setup_logging()
-#
 #     redis = Redis(**REDIS)
 #     mongo = Mongo(MONGO_URI)
 #     try:
@@ -163,8 +147,6 @@ def celery(**kwargs):
 # def init_db():
 #     from src.services.database import DatabaseService
 #     from src.databases import Redis, Mongo
-#
-#     setup_logging()
 #
 #     mongo = Mongo(MONGO_URI)
 #     mongo_db = mongo.get_db()

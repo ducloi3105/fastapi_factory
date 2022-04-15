@@ -13,8 +13,6 @@ from config import ENVIRONMENT, BASE_DOMAIN
 
 from .constants import PAGINATION, VALID_DATETIME_FORMATS
 
-log = logging.getLogger('Core-Engine')
-
 
 def make_loggable_data(data):
     length = 1000
@@ -24,30 +22,6 @@ def make_loggable_data(data):
         result = result[:length] + '...'
 
     return result
-
-
-def log_data(mode: str,
-             template: str,
-             args: list = None,
-             kwargs: dict = None):
-    handler = getattr(log, mode)
-
-    if not args:
-        args = []
-    if not kwargs:
-        kwargs = {}
-
-    _args = [
-        make_loggable_data(i)
-        for i in args
-    ]
-
-    _kwargs = dict(list(map(
-        lambda i: (i[0], make_loggable_data(i[1])),
-        kwargs.items()
-    )))
-
-    handler(template.format(*_args, **_kwargs))
 
 
 def get_url_origin(url):

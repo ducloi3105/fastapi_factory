@@ -1,45 +1,53 @@
 from src.bases.error.base import BaseError
+from fastapi import HTTPException
 
 
-class HTTPError(BaseError):
+class HTTPError(HTTPException):
     status_code = 500
 
+    def __init__(self, detail=None):
+        if detail is not None:
+            self.detail = detail
+        super(HTTPError, self).__init__(self.status_code, self.detail)
+
     def output(self):
-        data = super(HTTPError, self).output()
-        data['status_code'] = self.status_code
+        data = dict(
+            status_code=self.status_code,
+            detail=self.detail
+        )
         return data
 
 
 class MethodNotAllowed(HTTPError):
     status_code = 405
-    message = 'Method not allowed.'
+    detail = 'Method not allowed.'
 
 
 class AuthenticationError(HTTPError):
     status_code = 401
-    message = 'Authentication error.'
+    detail = 'Authentication error.'
 
 
 class BadRequestParams(HTTPError):
     status_code = 400
-    message = 'Bad request params.'
+    detail = 'Bad request params.'
 
 
 class PermissionError(HTTPError):
     status_code = 403
-    message = 'Permission error.'
+    detail = 'Permission error.'
 
 
 class ConflictError(HTTPError):
     status_code = 409
-    message = 'Conflict.'
+    detal = 'Conflict error.'
 
 
 class ServiceNotAvailable(HTTPError):
     status_code = 503
-    message = 'Service not available.'
+    detail = 'Service not available.'
 
 
 class ServerError(HTTPError):
     status_code = 500
-    message = 'Server error.'
+    detail = 'Server error.'
