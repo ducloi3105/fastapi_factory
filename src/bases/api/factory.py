@@ -31,6 +31,7 @@ class Factory(object):
     @staticmethod
     def default_error_handler(app):
         @app.exception_handler(Exception)
+        @app.exception_handler(HTTPException)
         async def handle_error(e, response):
             e.state.session.rollback()
             await e.state.async_session.rollback()
@@ -57,6 +58,7 @@ class Factory(object):
                 sentry_sdk.capture_exception(e)
                 # if app.debug:
                 #     raise e
+            data['status_code'] = status_code
             return JSONResponse(
                 status_code=status_code,
                 content=data
@@ -152,6 +154,7 @@ class Factory(object):
 
         payload = dict(
             body=request.body.__dict__,
+            params=request.query_params
         )
 
         log_data(

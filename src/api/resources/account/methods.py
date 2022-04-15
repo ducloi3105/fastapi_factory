@@ -20,10 +20,14 @@ async def create_account(payload: PostSchema, request: Request = None):
     session = request.state.async_session
     account_logic = AccountLogic(session)
     query = account_logic.get(payload.email)
-    account = await session.execute(query)
-    account = account.fetchone()
-    if account:
+    query = await session.execute(query)
+    if query.fetchone():
         raise ConflictError('AccountExists')
-    account = account_logic.create(payload.email, payload.name)
+
+    account = account_logic.create(
+        email=payload.email,
+        name=payload.name
+    )
+
     await session.commit()
     return account.to_json()
