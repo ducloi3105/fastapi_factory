@@ -30,6 +30,11 @@ class PermissionError(HTTPError):
     message = 'Permission error.'
 
 
+class ConflictError(HTTPError):
+    status_code = 409
+    message = 'Conflict.'
+
+
 class ServiceNotAvailable(HTTPError):
     status_code = 503
     message = 'Service not available.'

@@ -8,3 +8,8 @@ from src.bases.schema import (
 
 class GetSchema(BaseListingSchema):
     search_text: str | None = Query(None, max_length=STRING_LENGTH_VALIDATORS['LONG'])
+
+
+class PostSchema(BaseSchema):
+    email: str 
+    name: str | None = None
