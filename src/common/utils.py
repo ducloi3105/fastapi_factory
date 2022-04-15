@@ -2,6 +2,7 @@ import logging
 import jwt
 import hashlib
 import secrets
+import uuid
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
@@ -213,3 +214,10 @@ def gen_html(content, data, template_dir=None):
     return template_handler.render(
         **data
     )
+
+
+def generate_message_id(suffix='@vccloud.vn'):
+    if not isinstance(suffix, str):
+        suffix = str(suffix)
+
+    return ''.join(['<', str(uuid.uuid4()) + suffix, '>'])
