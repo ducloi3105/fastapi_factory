@@ -46,3 +46,9 @@ class CeleryConfig(object):
         host=REDIS['host'],
         db=0
     )
+
+
+class ImapConfig:
+    imap_host = data.get('IMAP_HOST', 'imap_host')
+    imap_port = data.get('IMAP_PORT', 'imap_port')
+    message_id_prefix = data.get('MESSAGE_ID_SUFFIX', 'message_id_suffix')

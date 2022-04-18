@@ -1,6 +1,7 @@
 from imap_tools import MailMessageFlags
 
-class ImapFlag(MailMessageFlags):
+
+class ImapConstants(MailMessageFlags):
     FLAGS = 'FLAGS'
     BODY = 'BODY[]'
     MESSAGE_ID = 'BODY[HEADER.FIELDS (MESSAGE-ID)]'
@@ -14,3 +15,4 @@ class ImapFlag(MailMessageFlags):
         BODY,
         INTERNALDATE,
     ]
+    message_id_header = 'Message-ID: {}'

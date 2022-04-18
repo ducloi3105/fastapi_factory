@@ -216,8 +216,7 @@ def gen_html(content, data, template_dir=None):
     )
 
 
-def generate_message_id(suffix='@vccloud.vn'):
+def generate_message_id(suffix):
     if not isinstance(suffix, str):
         suffix = str(suffix)
-
     return ''.join(['<', str(uuid.uuid4()) + suffix, '>'])
