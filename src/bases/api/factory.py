@@ -150,7 +150,7 @@ class Factory(object):
 
     @staticmethod
     def log_request(request):
-        pattern = '{method} - {path} - {payload}'
+        pattern = '{method} - {endpoint} - {payload}'
 
         payload = dict(
             body=request.body.__dict__,
@@ -161,7 +161,7 @@ class Factory(object):
             mode='warning',
             template=pattern,
             kwargs=dict(
-                path=request.url,
+                endpoint=request.url,
                 payload=payload,
                 method=request.method
             )

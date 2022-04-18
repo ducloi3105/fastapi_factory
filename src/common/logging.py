@@ -55,6 +55,5 @@ def log_data(mode: str,
 
     frame = inspect.stack()[1]
     module = inspect.getmodule(frame[0])
-    filename = module.__name__
-    _kwargs['path'] = filename
+    template = f'{template} - {module.__name__}'
     handler(template.format(*_args, **_kwargs))
