@@ -7,6 +7,7 @@ from .postgres.seive import Sieve
 from .postgres.thread import Thread
 from .postgres.settings import Setting
 from .postgres.tracker import Tracker
+from .postgres.storage import Storage
 
 __all__ = (
     'BaseModel',

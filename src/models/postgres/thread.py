@@ -47,3 +47,9 @@ class Thread(BaseModel):
         secondary=folders,
         backref=backref('threads')
     )
+
+    account = relationship(
+        'Account',
+        backref=backref('threads',
+                        cascade='all,delete')
+    )
