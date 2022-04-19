@@ -1,6 +1,6 @@
 from src.bases.api import Request, Depends
 from src.bases.api.router import router
-from src.logic.account import AccountLogic
+from src.logic.postgres.account import AccountLogic
 from src.bases.error.api import ConflictError
 from .schemas import GetSchema, PostSchema
 
