@@ -47,13 +47,6 @@ class Message(BaseModel):
         nullable=False,
         index=True
     )
-    thread_id = Column(
-        String(STRING_LENGTH['UUID4']),
-        ForeignKey('thread.id'),
-        nullable=False,
-        index=True
-    )
-
     folder = relationship(
         'Folder',
         backref=backref('messages',
@@ -62,12 +55,6 @@ class Message(BaseModel):
 
     account = relationship(
         'Account',
-        backref=backref('messages',
-                        cascade='all,delete')
-    )
-
-    thread = relationship(
-        'Thread',
         backref=backref('messages',
                         cascade='all,delete')
     )

@@ -3,7 +3,7 @@ from .folder import Folder
 from .message import Message
 from .seive import Sieve
 from .settings import Setting
-from .thread import Thread
+from .participant import Participant
 from .tracker import Tracker
 from .storage import Storage
 from .verification import Verification
