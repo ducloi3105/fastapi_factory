@@ -19,6 +19,12 @@ class Message(BaseModel):
     in_reply_to = Column(
         String(STRING_LENGTH['LONG']), index=True
     )
+    md5_message_id = Column(
+        String(STRING_LENGTH['UUID4']), index=True
+    )
+    md5_in_reply_to = Column(
+        String(STRING_LENGTH['UUID4']), index=True
+    )
     subject = Column(
         String(STRING_LENGTH['LONG'])
     )
