@@ -26,6 +26,8 @@ REDIS = data.get('REDIS', {
     'password': 'password'
 })
 
+IMAP = data.get('IMAP', {})
+
 
 class ApiConfig(object):
     ENV = ENVIRONMENT
@@ -46,3 +48,9 @@ class CeleryConfig(object):
         host=REDIS['host'],
         db=0
     )
+
+
+class ImapConfig:
+    host = IMAP.get('HOST', '')
+    port = IMAP.get('PORT', 147)
+    message_id_prefix = IMAP.get('MESSAGE_ID_SUFFIX', 'message_id_suffix')
