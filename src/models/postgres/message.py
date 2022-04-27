@@ -28,6 +28,9 @@ class Message(BaseModel):
     subject = Column(
         String(STRING_LENGTH['LONG'])
     )
+    snippet = Column(
+        String(STRING_LENGTH['LONG'])
+    )
 
     received_at = Column(DateTime, index=True)  # sort by
     size = Column(Integer, index=True)  # len body
