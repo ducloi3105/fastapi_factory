@@ -9,8 +9,9 @@ class ThreadLogic(Logic):
         items = func.jsonb_to_recordset(Thread.messages).table_valued(
             column("folder", Text),
             column("id", Text)).render_derived(with_types=True)
-        query = self.session.query(
-            Thread.id,
-            items.c.folder,
-            items.c.id, ).filter(
-            items.c.folder == 'INBOX')
+
+        query = self.session.query(Thread).filter(
+            items.c.folder == 'INBOX'
+        ).distinct(Thread.id)
+        for t in query:
+            print(t.id, t.messages)
