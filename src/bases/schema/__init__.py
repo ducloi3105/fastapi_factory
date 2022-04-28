@@ -21,4 +21,4 @@ class BaseSchema(BaseModel):
 class BaseListingSchema(BaseSchema):
     page: int | None = PAGINATION['page']
     per_page: int | None = PAGINATION['per_page']
-    sorts: list | None = ['-created_at']
+    sorts: str | None = '-created_at'

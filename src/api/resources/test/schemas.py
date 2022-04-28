@@ -1,4 +1,4 @@
-from src.bases.schema.validate import BaseSchema
+from src.bases.schema import BaseSchema
 
 
 class GetSchema(BaseSchema):
