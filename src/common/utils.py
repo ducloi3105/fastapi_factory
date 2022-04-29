@@ -8,12 +8,11 @@ from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 from urllib.parse import urlparse
 from subprocess import CalledProcessError, check_output
-from jinja2 import FileSystemLoader, BaseLoader, Environment as JinjaEnv
 
 from config import ENVIRONMENT, BASE_DOMAIN
 
 from .constants import PAGINATION, VALID_DATETIME_FORMATS
-
+from src.common.logging import log
 
 def make_loggable_data(data):
     length = 1000
@@ -200,20 +199,6 @@ def execute_command(command: list):
         raise err
     log.info(f'Output from command:\n{output}')
     return output
-
-
-def gen_html(content, data, template_dir=None):
-    if template_dir:
-        loader = FileSystemLoader(template_dir)
-    else:
-        loader = BaseLoader()
-
-    template_handler = JinjaEnv(
-        loader=loader).from_string(content)
-
-    return template_handler.render(
-        **data
-    )
 
 
 def generate_message_id(suffix):

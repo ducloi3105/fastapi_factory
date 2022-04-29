@@ -2,7 +2,7 @@ import click
 import sys
 import uvicorn
 
-from config import POSTGRES_URI, MONGO_URI, REDIS, ENVIRONMENT
+from config import POSTGRES_URI, MONGO_URI, REDIS, ENVIRONMENT, POSTGRES_ASYNC_URI
 
 from src.common.logging import log, ContextFilter
 
@@ -24,7 +24,7 @@ def shell(ipython_args):
     import IPython
     from IPython.terminal.ipapp import load_default_config
 
-    from src.databases import Postgres, Redis
+    from src.databases import Postgres, Redis, PostgresAsync
     # from src.databases import Postgres, Mongo, Redis
 
     ip_config = load_default_config()
@@ -35,9 +35,14 @@ def shell(ipython_args):
         disable_autoflush=True)
     session = session_factory()
 
+    sql_async_db = PostgresAsync(POSTGRES_ASYNC_URI)
+    sql_async_session_factory = sql_async_db.create_session_factory(
+        disable_autoflush=True
+    )
+    async_session = sql_async_session_factory()
     ctx = dict(
         session=session,
-        session_factory=session_factory,
+        async_session=async_session,
         # mongo=Mongo(MONGO_URI),
         reids=Redis(**REDIS, db=0)
     )
@@ -113,42 +118,3 @@ def celery(**kwargs):
         f'--concurrency={concurrency}',
         f'--pool={pool}',
     ])
-
-#
-# @cli.command(short_help='Run a cron job.')
-# @click.argument('job_name')
-# @click.option('--interval')
-# def cronjob(job_name, **kwargs):
-#     from src.cronjobs import JOBS
-#     from src.databases import Redis, Mongo
-#
-#     redis = Redis(**REDIS)
-#     mongo = Mongo(MONGO_URI)
-#     try:
-#         job_class = JOBS[job_name]
-#     except KeyError:
-#         raise Exception('Job %s not found.' % job_name)
-#
-#     log.info('Running %s job ...' % job_name)
-#
-#     interval = kwargs.get('interval')
-#
-#     init_params = dict(
-#         mongo_db=mongo.get_db(), redis=redis
-#     )
-#     if interval:
-#         init_params['interval'] = interval
-#
-#     job_handler = job_class(**init_params)
-#     job_handler.run()
-
-#
-# @cli.command(short_help='db initialization')
-# def init_db():
-#     from src.services.database import DatabaseService
-#     from src.databases import Redis, Mongo
-#
-#     mongo = Mongo(MONGO_URI)
-#     mongo_db = mongo.get_db()
-#     db_service = DatabaseService(mongo_db=mongo_db)
-#     db_service.init_db()
