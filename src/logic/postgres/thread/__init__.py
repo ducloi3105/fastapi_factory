@@ -32,5 +32,4 @@ class ThreadLogic(Logic):
         if folder:
             query = query.where(items.c.folder == 'INBOX')
         query = query.distinct(Thread.id)
-        print(query, type(query),111111111111)
         return query

@@ -85,8 +85,14 @@ class Factory(object):
                 if hasattr(module, 'router'):
                     app.include_router(module.router)
 
-    def create_app(self):
-        app = FastAPI()
+    def create_app(self, config):
+        app = FastAPI(
+            title=config.TITLE,
+            description=config.DESCRIPTION,
+            version=config.VERSION,
+            terms_of_service=config.TERMS_OF_SERVICE,
+            contact=config.CONTACT,
+        )
 
         '''Cross origin'''
         origins = [
