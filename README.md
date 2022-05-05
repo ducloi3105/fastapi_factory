@@ -49,3 +49,11 @@ set password
 ALTER USER user_name WITH PASSWORD 'new_password';
 
 ```
+
+add index jsonb
+```
+create index messages_folder_id on thread (
+    (CAST((messages -> 'folder') AS TEXT)),
+    (CAST((messages -> 'id') AS TEXT))
+)
+```

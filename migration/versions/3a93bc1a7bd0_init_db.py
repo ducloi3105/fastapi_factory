@@ -1,8 +1,8 @@
-"""init model for webmail
+"""init db
 
-Revision ID: 599a67b9b342
+Revision ID: 3a93bc1a7bd0
 Revises: 
-Create Date: 2022-04-14 09:29:54.653782
+Create Date: 2022-05-04 16:52:53.563039
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '599a67b9b342'
+revision = '3a93bc1a7bd0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -41,6 +41,7 @@ def upgrade():
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('display_name', sa.String(length=100), nullable=False),
     sa.Column('color', sa.String(length=100), nullable=True),
+    sa.ForeignKeyConstraint(['account_id'], ['account.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_folder_account_id'), 'folder', ['account_id'], unique=False)
@@ -50,6 +51,23 @@ def upgrade():
     op.create_index(op.f('ix_folder_display_name'), 'folder', ['display_name'], unique=False)
     op.create_index(op.f('ix_folder_name'), 'folder', ['name'], unique=False)
     op.create_index(op.f('ix_folder_updated_at'), 'folder', ['updated_at'], unique=False)
+    op.create_table('participant',
+    sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=True),
+    sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=True),
+    sa.Column('deleted', sa.Boolean(), nullable=True),
+    sa.Column('email', sa.String(length=500), nullable=False),
+    sa.Column('name', sa.String(length=500), nullable=False),
+    sa.Column('account_id', sa.String(length=36), nullable=False),
+    sa.ForeignKeyConstraint(['account_id'], ['account.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_participant_account_id'), 'participant', ['account_id'], unique=False)
+    op.create_index(op.f('ix_participant_created_at'), 'participant', ['created_at'], unique=False)
+    op.create_index(op.f('ix_participant_deleted'), 'participant', ['deleted'], unique=False)
+    op.create_index(op.f('ix_participant_email'), 'participant', ['email'], unique=False)
+    op.create_index(op.f('ix_participant_name'), 'participant', ['name'], unique=False)
+    op.create_index(op.f('ix_participant_updated_at'), 'participant', ['updated_at'], unique=False)
     op.create_table('setting',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=True),
@@ -84,6 +102,35 @@ def upgrade():
     op.create_index(op.f('ix_sieve_enable'), 'sieve', ['enable'], unique=False)
     op.create_index(op.f('ix_sieve_name'), 'sieve', ['name'], unique=False)
     op.create_index(op.f('ix_sieve_updated_at'), 'sieve', ['updated_at'], unique=False)
+    op.create_table('storage',
+    sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=True),
+    sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=True),
+    sa.Column('deleted', sa.Boolean(), nullable=True),
+    sa.Column('filename', sa.String(length=1000), nullable=False),
+    sa.Column('filetype', sa.String(length=1000), nullable=True),
+    sa.Column('content_type', sa.String(length=1000), nullable=False),
+    sa.Column('size', sa.Integer(), nullable=True),
+    sa.Column('object_type', sa.String(length=1000), nullable=True),
+    sa.Column('object_id', sa.String(length=36), nullable=True),
+    sa.Column('url', sa.String(length=10000), nullable=False),
+    sa.Column('has_virus', sa.Boolean(), nullable=True),
+    sa.Column('meta', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('account_id', sa.String(length=36), nullable=False),
+    sa.ForeignKeyConstraint(['account_id'], ['account.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_storage_account_id'), 'storage', ['account_id'], unique=False)
+    op.create_index(op.f('ix_storage_content_type'), 'storage', ['content_type'], unique=False)
+    op.create_index(op.f('ix_storage_created_at'), 'storage', ['created_at'], unique=False)
+    op.create_index(op.f('ix_storage_deleted'), 'storage', ['deleted'], unique=False)
+    op.create_index(op.f('ix_storage_filename'), 'storage', ['filename'], unique=False)
+    op.create_index(op.f('ix_storage_filetype'), 'storage', ['filetype'], unique=False)
+    op.create_index(op.f('ix_storage_has_virus'), 'storage', ['has_virus'], unique=False)
+    op.create_index(op.f('ix_storage_object_id'), 'storage', ['object_id'], unique=False)
+    op.create_index(op.f('ix_storage_object_type'), 'storage', ['object_type'], unique=False)
+    op.create_index(op.f('ix_storage_updated_at'), 'storage', ['updated_at'], unique=False)
+    op.create_index(op.f('ix_storage_url'), 'storage', ['url'], unique=False)
     op.create_table('thread',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=True),
@@ -93,18 +140,21 @@ def upgrade():
     sa.Column('read', sa.Boolean(), nullable=True),
     sa.Column('starred', sa.Boolean(), nullable=True),
     sa.Column('has_attachments', sa.Boolean(), nullable=True),
-    sa.Column('snippet', sa.String(length=500), nullable=True),
-    sa.Column('snippets', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('subject', sa.String(length=500), nullable=True),
-    sa.Column('participants', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('last_message_at', sa.DateTime(), nullable=True),
+    sa.Column('participants', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('folders', postgresql.ARRAY(sa.String()), nullable=True),
+    sa.Column('snippets', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.ForeignKeyConstraint(['account_id'], ['account.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_thread_account_id'), 'thread', ['account_id'], unique=False)
     op.create_index(op.f('ix_thread_created_at'), 'thread', ['created_at'], unique=False)
     op.create_index(op.f('ix_thread_deleted'), 'thread', ['deleted'], unique=False)
+    op.create_index('ix_thread_folders', 'thread', ['folders'], unique=False, postgresql_using='gin')
     op.create_index(op.f('ix_thread_last_message_at'), 'thread', ['last_message_at'], unique=False)
+    op.create_index(op.f('ix_thread_participants'), 'thread', ['participants'], unique=False)
+    op.create_index(op.f('ix_thread_snippets'), 'thread', ['snippets'], unique=False)
     op.create_index(op.f('ix_thread_subject'), 'thread', ['subject'], unique=False)
     op.create_index(op.f('ix_thread_updated_at'), 'thread', ['updated_at'], unique=False)
     op.create_table('verification',
@@ -146,6 +196,7 @@ def upgrade():
     sa.Column('message_id_header', sa.String(length=1000), nullable=True),
     sa.Column('in_reply_to', sa.String(length=1000), nullable=True),
     sa.Column('subject', sa.String(length=1000), nullable=True),
+    sa.Column('snippet', sa.String(length=1000), nullable=True),
     sa.Column('received_at', sa.DateTime(), nullable=True),
     sa.Column('size', sa.Integer(), nullable=True),
     sa.Column('read', sa.Boolean(), nullable=True),
@@ -157,7 +208,6 @@ def upgrade():
     sa.Column('thread_id', sa.String(length=36), nullable=False),
     sa.ForeignKeyConstraint(['account_id'], ['account.id'], ),
     sa.ForeignKeyConstraint(['folder_id'], ['folder.id'], ),
-    sa.ForeignKeyConstraint(['old_folder_id'], ['folder.id'], ),
     sa.ForeignKeyConstraint(['thread_id'], ['thread.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -176,27 +226,19 @@ def upgrade():
     op.create_index(op.f('ix_message_thread_id'), 'message', ['thread_id'], unique=False)
     op.create_index(op.f('ix_message_uid'), 'message', ['uid'], unique=False)
     op.create_index(op.f('ix_message_updated_at'), 'message', ['updated_at'], unique=False)
-    op.create_table('thread_folder_association',
-    sa.Column('thread_id', sa.String(length=36), nullable=False),
-    sa.Column('folder_id', sa.String(length=36), nullable=False),
-    sa.ForeignKeyConstraint(['folder_id'], ['folder.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['thread_id'], ['thread.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('thread_id', 'folder_id')
-    )
     op.create_table('tracker',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=True),
     sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=True),
     sa.Column('deleted', sa.Boolean(), nullable=True),
     sa.Column('message_id', sa.String(length=36), nullable=True),
-    sa.Column('thread_id', sa.String(length=36), nullable=True),
+    sa.Column('md5_header_id', sa.String(length=36), nullable=True),
     sa.Column('sender', sa.String(length=1000), nullable=True),
     sa.Column('view_count', sa.Integer(), nullable=True),
     sa.Column('is_muted', sa.Boolean(), nullable=True),
     sa.Column('first_seen', sa.DateTime(), nullable=True),
     sa.Column('last_seen', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['message_id'], ['message.id'], ),
-    sa.ForeignKeyConstraint(['thread_id'], ['thread.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_tracker_created_at'), 'tracker', ['created_at'], unique=False)
@@ -205,7 +247,6 @@ def upgrade():
     op.create_index(op.f('ix_tracker_is_muted'), 'tracker', ['is_muted'], unique=False)
     op.create_index(op.f('ix_tracker_last_seen'), 'tracker', ['last_seen'], unique=False)
     op.create_index(op.f('ix_tracker_message_id'), 'tracker', ['message_id'], unique=False)
-    op.create_index(op.f('ix_tracker_thread_id'), 'tracker', ['thread_id'], unique=False)
     op.create_index(op.f('ix_tracker_updated_at'), 'tracker', ['updated_at'], unique=False)
     op.create_index(op.f('ix_tracker_view_count'), 'tracker', ['view_count'], unique=False)
     # ### end Alembic commands ###
@@ -215,7 +256,6 @@ def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_index(op.f('ix_tracker_view_count'), table_name='tracker')
     op.drop_index(op.f('ix_tracker_updated_at'), table_name='tracker')
-    op.drop_index(op.f('ix_tracker_thread_id'), table_name='tracker')
     op.drop_index(op.f('ix_tracker_message_id'), table_name='tracker')
     op.drop_index(op.f('ix_tracker_last_seen'), table_name='tracker')
     op.drop_index(op.f('ix_tracker_is_muted'), table_name='tracker')
@@ -223,7 +263,6 @@ def downgrade():
     op.drop_index(op.f('ix_tracker_deleted'), table_name='tracker')
     op.drop_index(op.f('ix_tracker_created_at'), table_name='tracker')
     op.drop_table('tracker')
-    op.drop_table('thread_folder_association')
     op.drop_index(op.f('ix_message_updated_at'), table_name='message')
     op.drop_index(op.f('ix_message_uid'), table_name='message')
     op.drop_index(op.f('ix_message_thread_id'), table_name='message')
@@ -253,11 +292,26 @@ def downgrade():
     op.drop_table('verification')
     op.drop_index(op.f('ix_thread_updated_at'), table_name='thread')
     op.drop_index(op.f('ix_thread_subject'), table_name='thread')
+    op.drop_index(op.f('ix_thread_snippets'), table_name='thread')
+    op.drop_index(op.f('ix_thread_participants'), table_name='thread')
     op.drop_index(op.f('ix_thread_last_message_at'), table_name='thread')
+    op.drop_index('ix_thread_folders', table_name='thread', postgresql_using='gin')
     op.drop_index(op.f('ix_thread_deleted'), table_name='thread')
     op.drop_index(op.f('ix_thread_created_at'), table_name='thread')
     op.drop_index(op.f('ix_thread_account_id'), table_name='thread')
     op.drop_table('thread')
+    op.drop_index(op.f('ix_storage_url'), table_name='storage')
+    op.drop_index(op.f('ix_storage_updated_at'), table_name='storage')
+    op.drop_index(op.f('ix_storage_object_type'), table_name='storage')
+    op.drop_index(op.f('ix_storage_object_id'), table_name='storage')
+    op.drop_index(op.f('ix_storage_has_virus'), table_name='storage')
+    op.drop_index(op.f('ix_storage_filetype'), table_name='storage')
+    op.drop_index(op.f('ix_storage_filename'), table_name='storage')
+    op.drop_index(op.f('ix_storage_deleted'), table_name='storage')
+    op.drop_index(op.f('ix_storage_created_at'), table_name='storage')
+    op.drop_index(op.f('ix_storage_content_type'), table_name='storage')
+    op.drop_index(op.f('ix_storage_account_id'), table_name='storage')
+    op.drop_table('storage')
     op.drop_index(op.f('ix_sieve_updated_at'), table_name='sieve')
     op.drop_index(op.f('ix_sieve_name'), table_name='sieve')
     op.drop_index(op.f('ix_sieve_enable'), table_name='sieve')
@@ -270,6 +324,13 @@ def downgrade():
     op.drop_index(op.f('ix_setting_created_at'), table_name='setting')
     op.drop_index(op.f('ix_setting_account_id'), table_name='setting')
     op.drop_table('setting')
+    op.drop_index(op.f('ix_participant_updated_at'), table_name='participant')
+    op.drop_index(op.f('ix_participant_name'), table_name='participant')
+    op.drop_index(op.f('ix_participant_email'), table_name='participant')
+    op.drop_index(op.f('ix_participant_deleted'), table_name='participant')
+    op.drop_index(op.f('ix_participant_created_at'), table_name='participant')
+    op.drop_index(op.f('ix_participant_account_id'), table_name='participant')
+    op.drop_table('participant')
     op.drop_index(op.f('ix_folder_updated_at'), table_name='folder')
     op.drop_index(op.f('ix_folder_name'), table_name='folder')
     op.drop_index(op.f('ix_folder_display_name'), table_name='folder')

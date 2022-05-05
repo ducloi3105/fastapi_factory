@@ -1,7 +1,7 @@
 from sqlalchemy import func, column, Text, Boolean, String
 from sqlalchemy.future import select
 
-from src.models.postgres import Thread
+from src.models.postgres import Thread, Folder
 from src.bases.logic import Logic
 
 
@@ -15,7 +15,7 @@ class ThreadLogic(Logic):
 
         query = self.session.query(Thread).filter(
             items.c.folder == folder
-        ).distinct(Thread.id)
+        )
         return query
 
     def find_thread2(self, folder=None):
@@ -31,5 +31,10 @@ class ThreadLogic(Logic):
         query = select(Thread.id)
         if folder:
             query = query.where(items.c.folder == 'INBOX')
-        query = query.distinct(Thread.id)
+        query = query
         return query
+
+    def find_thread3(self, folder=None):
+        return self.session.query(Thread).join(Folder, Thread.folders).filter(
+            Folder.id == folder
+        )
