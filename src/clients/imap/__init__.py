@@ -9,8 +9,9 @@ from config import ImapConfig
 
 class ImapClient:
     def __init__(self, email: str, password: str):
-        self.imap_host = ImapConfig.imap_host
-        self.imap_port = ImapConfig.imap_port
+        self.imap_host = ImapConfig.host
+        self.imap_port = ImapConfig.port
+        self.ssl = ImapConfig.ssl
         self.email = email
         self.password = password
         self.client = self.init_client()
