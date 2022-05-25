@@ -35,7 +35,7 @@ class ImapClient:
         if folder is not None:
             params['folder'] = folder
         return self.client.folder.list(**params)
-    
+
     def create_folder(self, folder: str):
         _, message = self.client.folder.create(folder=folder)
         if "Create completed" not in message:
@@ -63,12 +63,12 @@ class ImapClient:
         )
         if "Rename completed" not in message:
             log_data(
-                    mode='error',
-                    template='Could not rename folder: {old_name}',
-                    kwargs=dict(old_name=old_name)
-                )
+                mode='error',
+                template='Could not rename folder: {old_name}',
+                kwargs=dict(old_name=old_name)
+            )
             raise ClientError(message)
-    
+
     def set_flags(self, uids: list[int], flag: str):
         result, _ = self.client.flag(
             uid_list=uids,
@@ -78,22 +78,22 @@ class ImapClient:
         ok, message = result
         if "UID" not in message:
             log_data(
-                    mode='error',
-                    template='Could not set flag for uids: {uids}',
-                    kwargs=dict(uids=uids)
-                )
+                mode='error',
+                template='Could not set flag for uids: {uids}',
+                kwargs=dict(uids=uids)
+            )
             raise ClientError(message)
 
     def delete_mesages(self, folder: str, uids: list[int]):
         self.client.folder.set(folder=folder)
-        result, _= self.client.delete(uids)
+        result, _ = self.client.delete(uids)
         _, message = result
         if "Deleted" not in message:
             log_data(
-                    mode='error',
-                    template='Could not delete uids: {uids}, folder: {folder}',
-                    kwargs=dict(uids=uids, folder=folder)
-                )
+                mode='error',
+                template='Could not delete uids: {uids}, folder: {folder}',
+                kwargs=dict(uids=uids, folder=folder)
+            )
             raise ClientError(message)
 
     def empty_folder(self, folder: str):
@@ -103,12 +103,12 @@ class ImapClient:
         _, message = result
         if "Deleted" not in message:
             log_data(
-                    mode='error',
-                    template='Could not empty folder: {folder}',
-                    kwargs=dict(folder=folder)
-                )
+                mode='error',
+                template='Could not empty folder: {folder}',
+                kwargs=dict(folder=folder)
+            )
             raise ClientError(message)
-    
+
     def new_message(self, folder: str, flags: list[str]) -> dict:
         uniq_id = generate_message_id(ImapConfig.message_id_prefix)
         message_id_header = ImapConstants.message_id_header.format(uniq_id)
@@ -122,10 +122,10 @@ class ImapClient:
         )
         if "Append completed" not in message:
             log_data(
-                    mode='error',
-                    template='Could not create new message - folder: {folder}',
-                    kwargs=dict(folder=folder)
-                )
+                mode='error',
+                template='Could not create new message - folder: {folder}',
+                kwargs=dict(folder=folder)
+            )
             raise ClientError(message)
 
         response = self.client.fetch(
