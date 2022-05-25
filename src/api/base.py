@@ -28,4 +28,4 @@ factory = Factory(
     resource_module=resources,
 )
 
-app = factory.create_app()
+app = factory.create_app(config=ApiConfig)

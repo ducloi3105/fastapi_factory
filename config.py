@@ -40,6 +40,18 @@ class ApiConfig(object):
 
     PROPAGATE_EXCEPTIONS = True
 
+    TITLE = 'Business Email'
+    DESCRIPTION = """
+    API docs for webmail
+    """
+    VERSION = '0.0.1'
+    TERMS_OF_SERVICE = 'https://bizflycloud.vn/business-email'
+    CONTACT = dict(
+        name='Business Email',
+        url='https://mail.bizflycloud.vn/',
+        email='support@bizflycloud.vn'
+    )
+
 
 class CeleryConfig(object):
     broker_url = 'redis://:{password}@{host}:{port}/{db}'.format(
