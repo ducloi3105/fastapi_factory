@@ -18,12 +18,8 @@ async def account(payload: GetSchema = Depends(GetSchema), request: Request = No
     import time
     x = time.time()
     query = thread_logic.find_thread2(folder=payload.folder)
-    print(time.time() - x)
-    y = time.time()
     query = await session.execute(
         query
     )
-    print('11111', time.time() - y)
     thread = query.fetchone()
-    print(thread)
     return dict(success=True)
